@@ -127,11 +127,12 @@ class TestProviderAdapterProperties:
 
 class TestCircuitBreakerProperties:
 
+    @pytest.mark.asyncio
     @given(
         failures_before_success=st.integers(min_value=0, max_value=100),
         threshold=st.integers(min_value=1, max_value=20)
     )
-    def test_state_remains_closed_if_failures_below_threshold(self, failures_before_success, threshold):
+    async def test_state_remains_closed_if_failures_below_threshold(self, failures_before_success, threshold):
         """
         Property 6: If consecutive failures never reach the threshold,
         the circuit breaker strictly remains in the CLOSED state.
@@ -142,26 +143,27 @@ class TestCircuitBreakerProperties:
         max_consecutive_failures = min(failures_before_success, threshold - 1)
         
         for _ in range(max_consecutive_failures):
-            cb.record_failure()
-            assert cb.state == CircuitState.CLOSED
-            assert cb.is_available is True
+            await cb.record_failure()
+            assert await cb.get_state() == CircuitState.CLOSED
+            assert await cb.is_available() is True
             
-        cb.record_success()
-        assert cb.state == CircuitState.CLOSED
+        await cb.record_success()
+        assert await cb.get_state() == CircuitState.CLOSED
 
+    @pytest.mark.asyncio
     @given(threshold=st.integers(min_value=1, max_value=50))
-    def test_opens_exactly_at_threshold(self, threshold):
+    async def test_opens_exactly_at_threshold(self, threshold):
         """
         Property 6: Circuit opens EXACTLY when failures = threshold.
         """
         cb = CircuitBreaker(name="prop_test", failure_threshold=threshold)
         
         for i in range(threshold):
-            assert cb.state == CircuitState.CLOSED
-            cb.record_failure()
+            assert await cb.get_state() == CircuitState.CLOSED
+            await cb.record_failure()
             
-        assert cb.state == CircuitState.OPEN
-        assert cb.is_available is False
+        assert await cb.get_state() == CircuitState.OPEN
+        assert await cb.is_available() is False
 
 
 # --- Property 16: Retry Behavior Consistency ---

@@ -18,6 +18,10 @@ TEST_ADMIN_KEY = "test-admin-token-123"
 settings = get_settings()
 settings.security.admin_api_key = TEST_ADMIN_KEY
 
+# Bypass authentication for integration tests
+from app.api.dependencies import authenticate_api_key
+app.dependency_overrides[authenticate_api_key] = lambda: None
+
 
 # ===========================================================================
 # Health Endpoint (full middleware stack)

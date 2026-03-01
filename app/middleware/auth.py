@@ -79,6 +79,7 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
 
         # Attach correlation ID to all responses
         response.headers["X-Request-ID"] = request_id
+        response.headers["X-Correlation-ID"] = request_id
 
         # Log response
         latency_ms = int((time.time() - request.state.start_time) * 1000)
