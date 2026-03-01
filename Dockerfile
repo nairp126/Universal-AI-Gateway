@@ -19,13 +19,13 @@ COPY --from=builder /install /usr/local
 RUN pip install --no-cache-dir setuptools
 
 # Copy application code
-COPY app/ ./app/
-COPY alembic.ini* ./
-COPY run.py .
+COPY --chown=appuser:appuser app/ ./app/
+COPY --chown=appuser:appuser alembic.ini* ./
+COPY --chown=appuser:appuser run.py .
 
 # Copy migrations directory only if it exists (R2-7)
 # Use a wildcard so the build doesn't fail if it's missing
-COPY migration[s]/ ./migrations/
+COPY --chown=appuser:appuser migration[s]/ ./migrations/
 
 # Non-root user
 RUN useradd --create-home appuser
@@ -36,7 +36,8 @@ ENV ENVIRONMENT=production \
     HOST=0.0.0.0 \
     PORT=8000 \
     LOG_LEVEL=INFO \
-    LOG_FORMAT=json
+    LOG_FORMAT=json \
+    PYTHONPATH=/app
 
 EXPOSE 8000
 

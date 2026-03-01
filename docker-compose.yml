@@ -13,7 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -26,7 +26,7 @@ services:
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -36,7 +36,7 @@ services:
     image: jaegertracing/all-in-one:latest
     ports:
       - "16686:16686" # UI
-      - "4317:4317"   # OTLP gRPC
+      - "4417:4317" # OTLP gRPC (Host port shifted to 4417 to avoid WSL conflict)
     environment:
       - COLLECTOR_OTLP_ENABLED=true
 
@@ -64,6 +64,7 @@ services:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
       - ENABLE_TRACING=true
       - OTLP_ENDPOINT=http://jaeger:4317
+      - PYTHONPATH=/app
     depends_on:
       postgres:
         condition: service_healthy
@@ -74,7 +75,7 @@ services:
     volumes:
       - ./app:/app/app
       - ./.env:/app/.env
-    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    command: [ "python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload" ]
 
 volumes:
   postgres_data:
