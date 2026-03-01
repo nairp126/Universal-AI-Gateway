@@ -11,16 +11,12 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.core.config import get_settings
 
-client = TestClient(app, raise_server_exceptions=False)
-TEST_ADMIN_KEY = "test-admin-token-123"
-
-# Override settings for tests
-settings = get_settings()
-settings.security.admin_api_key = TEST_ADMIN_KEY
-
 # Bypass authentication for integration tests
 from app.api.dependencies import authenticate_api_key
 app.dependency_overrides[authenticate_api_key] = lambda: None
+
+client = TestClient(app, raise_server_exceptions=False)
+TEST_ADMIN_KEY = "test-admin-token-123"
 
 
 # ===========================================================================

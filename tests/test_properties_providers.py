@@ -137,7 +137,9 @@ class TestCircuitBreakerProperties:
         Property 6: If consecutive failures never reach the threshold,
         the circuit breaker strictly remains in the CLOSED state.
         """
-        cb = CircuitBreaker(name="prop_test", failure_threshold=threshold)
+        # Use a unique name for each example to avoid Redis key collisions
+        cb_name = f"prop_test_closed_{uuid.uuid4().hex}"
+        cb = CircuitBreaker(name=cb_name, failure_threshold=threshold)
         
         # If we take max (threshold - 1) consecutive failures
         max_consecutive_failures = min(failures_before_success, threshold - 1)
@@ -156,7 +158,9 @@ class TestCircuitBreakerProperties:
         """
         Property 6: Circuit opens EXACTLY when failures = threshold.
         """
-        cb = CircuitBreaker(name="prop_test", failure_threshold=threshold)
+        # Use a unique name for each example to avoid Redis key collisions
+        cb_name = f"prop_test_open_{uuid.uuid4().hex}"
+        cb = CircuitBreaker(name=cb_name, failure_threshold=threshold)
         
         for i in range(threshold):
             assert await cb.get_state() == CircuitState.CLOSED
