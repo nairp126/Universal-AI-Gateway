@@ -14,7 +14,7 @@
 
 ### *Seamlessly bridge the gap between your apps and OpenAI, Anthropic, & AWS Bedrock.*
 
-[**Explore Technical Docs**](docs/README.md) • [**Usage Guide**](docs/usage%20guide.md) • [**API Reference**](docs/API_REFERENCE.md)
+[**Explore Technical Docs**](docs/README.md) • [**Usage Guide**](docs/USAGE_GUIDE.md) • [**API Reference**](docs/API_REFERENCE.md)
 
 </div>
 

@@ -11,7 +11,7 @@ Welcome to the Universal LLM Gateway documentation. This hub provides a deep div
 
 - **[Enterprise Features Deep Dive](ENTERPRISE_FEATURES.md)**: Detailed algorithms for Semantic Caching, Model Racing, and Budgeting.
 - **[API Reference](API_REFERENCE.md)**: Exhaustive specification for all endpoints, headers, and error codes.
-- **[Usage Guide](usage%20guide.md)**: Practical examples of how to consume the gateway.
+- **[Usage Guide](USAGE_GUIDE.md)**: Practical examples of how to consume the gateway.
 
 ## 🛡️ Trust & Security
 
