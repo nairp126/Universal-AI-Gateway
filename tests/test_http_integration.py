@@ -10,17 +10,36 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 from app.core.config import get_settings
-# Override settings for tests
+
+# Override settings once globally for all integration tests
 settings = get_settings()
 settings.security.admin_api_key = "test-admin-token-123"
 TEST_ADMIN_KEY = settings.security.admin_api_key
 
-# Bypass authentication for integration tests
-from app.api.dependencies import authenticate_api_key, verify_admin_token
-app.dependency_overrides[authenticate_api_key] = lambda: None
-app.dependency_overrides[verify_admin_token] = lambda: True
+@pytest.fixture(autouse=True)
+def setup_overrides():
+    """Ensure dependencies are overridden for every test."""
+    from app.api.dependencies import authenticate_api_key, verify_admin_token
+    app.dependency_overrides[authenticate_api_key] = lambda: None
+    app.dependency_overrides[verify_admin_token] = lambda: True
+    yield
+    # No need to clear here as other tests might rely on them, but we could
+    # app.dependency_overrides.clear()
 
-client = TestClient(app, raise_server_exceptions=False)
+@pytest.fixture(name="client_fixture")
+def client_fixture():
+    """Fixture for TestClient."""
+    with TestClient(app, raise_server_exceptions=False) as c:
+        yield c
+
+# Global variable for tests to use (R2-8)
+client = None
+
+@pytest.fixture(autouse=True)
+def _set_global_client(client_fixture):
+    """Set the global client variable for each test execution."""
+    global client
+    client = client_fixture
 
 
 # ===========================================================================
@@ -43,8 +62,8 @@ class TestHealthHTTP:
     def test_health_has_providers(self):
         resp = client.get("/health")
         data = resp.json()
-        assert "components" in data
-        assert "providers" in data["components"]
+        assert "providers" in data
+        assert len(data["providers"]) > 0
 
     def test_health_providers_have_circuit_state(self):
         """R2: Live health checks return circuit breaker state."""
