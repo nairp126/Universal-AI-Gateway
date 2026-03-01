@@ -62,8 +62,9 @@ class TestHealthHTTP:
     def test_health_has_providers(self):
         resp = client.get("/health")
         data = resp.json()
-        assert "providers" in data
-        assert len(data["providers"]) > 0
+        assert "components" in data
+        assert "providers" in data["components"]
+        assert len(data["components"]["providers"]) > 0
 
     def test_health_providers_have_circuit_state(self):
         """R2: Live health checks return circuit breaker state."""
